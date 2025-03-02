@@ -84,13 +84,18 @@ function addPlayButtons() {
     const imgContainer = card.querySelector('.productImageContainer');
     if (!imgContainer) return;
 
+    if (card.querySelector('.carturestify-play-button')) {
+      return;
+    }
+
     const playButton = document.createElement("button");
+    playButton.className = 'carturestify-play-button';
     playButton.textContent = "🎵";
     playButton.style.position = "absolute";
     playButton.style.top = "50%";
     playButton.style.left = "50%";
     playButton.style.transform = "translate(-50%, -50%)";
-    playButton.style.background = "rgba(255,255,255,0.75)";
+    playButton.style.background = "rgba(255,0,145,0.4)";
     playButton.style.color = "#fff";
     playButton.style.border = "none";
     playButton.style.padding = "10px";
@@ -116,13 +121,12 @@ function handlePlayClick(card) {
   if (artistElement && titleElement) {
     const artistName = artistElement.textContent;
     let albumName = titleElement.textContent;
-    albumName = albumName.replace(/\s*-\s*Vinyl(?:\s*\d+"|\s*\d+\s*RPM)?/i, '')
-    .replace(/\s*\(.*Vinyl.*\)/i, '')
-    .replace(/\s*\(.*?\)/g, '')
-    .replace(/\s*Vinyl\s*\d*"?\s*/i, '')
+    // filter
+    albumName = albumName
+    .replace(/[(\-].*$/, '')
+    .replace(/\b\d+\s*(Vinyl|Vinyls)\b/i, '')
+    .replace(/\b(Vinyl|Vinyls)\b/i, '')
     .trim();
-
-    console.log(">>> search for: ", `${albumName} ${artistName}`)
 
     searchAndDisplayAlbum(artistName, albumName);
     maximizePlaylist();
@@ -173,9 +177,11 @@ function searchAndDisplayAlbum(artist, album) {
 
     toggleSpinnerDisplay('block')
 
+    const search = (artist !== album) ? `${artist} ${album}` : artist;
+    console.log(">>> search for:", search)
     fetch("https://albumzy.com/api/spotify/search", {
       method : "POST",
-      body   : JSON.stringify({search: `${album} ${artist}`, limit: 3}),
+      body   : JSON.stringify({search, limit: 3}),
       headers: {
         "Content-Type": "application/json",
         "X-AUTH-TOKEN": token
@@ -203,14 +209,6 @@ function searchAndDisplayAlbum(artist, album) {
   });
 }
 
-chrome.runtime.onMessage.addListener(
-  function(request, sender, sendResponse) {
-    if( request.message === "onLoginComplete" ) {
-      init();
-    }
-  }
-);
-
 function init() {
   chrome.storage.local.get("ALBUMZY_TOKEN", (data) => {
     const token = data["ALBUMZY_TOKEN"];
@@ -221,6 +219,26 @@ function init() {
     initializePlaylist();
     addPlayButtons();
   })
+
+  const observer = new MutationObserver(() => {
+    addPlayButtons();
+  });
+
+  const targetNode = document.querySelector('.cartu-grid-list');
+  if (targetNode) {
+    observer.observe(targetNode, {childList: true, subtree: true});
+    addPlayButtons();
+  }
 }
 
-setTimeout(() => {init()}, 3000)
+chrome.runtime.onMessage.addListener(
+  function (request) {
+    if (request.message === "onLoginComplete") {
+      init();
+    }
+  }
+);
+
+setTimeout(() => {
+  init()
+}, 3000)
