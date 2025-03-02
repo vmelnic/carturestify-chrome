@@ -1,0 +1,59 @@
+{
+  "manifest_version": 3,
+  "name": "Carturestify",
+  "version": "1.0",
+  "description": "Enhance Carturesti with Spotify album search via ALBUMZY",
+  "icons": {
+    "16": "icon-16.png",
+    "48": "icon-48.png",
+    "128": "icon-128.png"
+  },
+  "permissions": [
+    "storage",
+    "identity",
+    "activeTab",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://carturesti.ro/*",
+    "https://www.carturesti.ro/*",
+    "https://carturesti.md/*",
+    "https://www.carturesti.md/*",
+    "https://albumzy.com/*",
+    "https://www.albumzy.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://carturesti.ro/*",
+        "https://www.carturesti.ro/*",
+        "https://carturesti.md/*",
+        "https://www.carturesti.md/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "styles.css"
+      ],
+      "run_at": "document_end"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "icon.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "icon.png"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ]
+}

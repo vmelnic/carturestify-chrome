@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carturestify Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="popup.js"></script>
+    <style>
+      body {
+        font-family: 'Manrope', sans-serif;
+      }
+    </style>
+</head>
+<body class="bg-gray-100 flex justify-center" style="width: 300px;height: auto">
+    <div id="auth" class="bg-white p-8 rounded shadow-md w-full max-w-sm">
+        <h1 class="text-2xl font-bold mb-4">Login</h1>
+        <p class="mb-4">Enter your ALBUMZI email and the password set in this application to proceed.</p>
+        <p class="mb-4">Ensure that the email matches the one linked to your ALBUMZI account.</p>
+        <input id="username" type="text" placeholder="Username" class="block w-full p-2 border rounded mb-4">
+        <input id="password" type="password" placeholder="Password" class="block w-full p-2 border rounded mb-4">
+        <button id="login" class="w-full bg-blue-500 text-white p-2 rounded mb-4">Login</button>
+        <a href="https://albumzy.com" target="_blank" class="text-blue">albumzy.com</a>
+    </div>
+    <div id="logout-container" class="bg-white p-8 rounded shadow-md w-full max-w-sm hidden">
+        <h2 class="text-2xl font-bold mb-4">Logout</h2>
+        <p class="mb-4">If you log out, you won't be able to search playlists by artist and album.</p>
+        <p class="mb-4">If you want to log out, press the button below.</p>
+        <button id="logout" class="w-full bg-red-500 text-white p-2 rounded">Logout</button>
+    </div>
+</body>
+</html>
