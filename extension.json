@@ -1,0 +1,14 @@
+[
+  ".gitignore",
+  "background.js",
+  "content.js",
+  "icon.png",
+  "icon-16.png",
+  "icon-48.png",
+  "icon-128.png",
+  "manifest.json",
+  "popup.html",
+  "popup.js",
+  "README.md",
+  "styles.css"
+]
