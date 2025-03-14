@@ -79,48 +79,77 @@ function togglePlaylist() {
 }
 
 function addPlayButtons() {
+  // Adding play button to cards.
   const cards = document.querySelectorAll('.cartu-grid-tile');
   cards.forEach((card) => {
-    const imgContainer = card.querySelector('.productImageContainer');
-    if (!imgContainer) return;
-
+    let imgContainer = card.querySelector('.productImageContainer');
+    if (!imgContainer) {
+      return;
+    }
     if (card.querySelector('.carturestify-play-button')) {
       return;
     }
-
-    const playButton = document.createElement("button");
-    playButton.className = 'carturestify-play-button';
-    playButton.textContent = "🎵";
-    playButton.style.position = "absolute";
-    playButton.style.top = "50%";
-    playButton.style.left = "50%";
-    playButton.style.transform = "translate(-50%, -50%)";
-    playButton.style.background = "rgba(255,0,145,0.4)";
-    playButton.style.color = "#fff";
-    playButton.style.border = "none";
-    playButton.style.padding = "10px";
-    playButton.style.borderRadius = "50%";
-    playButton.style.cursor = "pointer";
-    playButton.style.fontSize = "20px";
-    playButton.style.lineHeight = "1";
-
-    playButton.addEventListener("click", (event) => {
-      event.preventDefault()
-      handlePlayClick(card);
-    });
-
-    imgContainer.style.position = "relative";
-    imgContainer.appendChild(playButton);
+    addPlayButton(imgContainer, card)
   });
+
+  const products = document.querySelectorAll('.main-product');
+  products.forEach((product) => {
+      let sliderContainer = product.querySelector('.imageSlider');
+      if (!sliderContainer) {
+        return;
+      }
+    if (product.querySelector('.carturestify-play-button')) {
+      return;
+    }
+    addPlayButton(sliderContainer, product)
+  })
+
+}
+
+function addPlayButton(container, card) {
+  const playButton = document.createElement("button");
+  playButton.className = 'carturestify-play-button';
+  playButton.textContent = "🎵";
+  playButton.style.position = "absolute";
+  playButton.style.top = "50%";
+  playButton.style.left = "50%";
+  playButton.style.transform = "translate(-50%, -50%)";
+  playButton.style.background = "rgba(255,206,246,0.83)";
+  playButton.style.color = "#fff";
+  playButton.style.border = "none";
+  playButton.style.padding = "10px";
+  playButton.style.borderRadius = "50%";
+  playButton.style.cursor = "pointer";
+  playButton.style.fontSize = "20px";
+  playButton.style.lineHeight = "1";
+
+  playButton.addEventListener("click", (event) => {
+    event.preventDefault()
+    handlePlayClick(card);
+  });
+
+  container.style.position = "relative";
+  container.appendChild(playButton);
 }
 
 function handlePlayClick(card) {
-  const artistElement = card.querySelector('.subtitlu-produs a');
-  const titleElement = card.querySelector('.md-title');
+  let artistElement = card.querySelector('.subtitlu-produs a');
+  if (!artistElement) {
+    artistElement = card.querySelector('.titlesContainer .autorProdus a');
+  }
+
+  let titleElement = card.querySelector('.md-title');
+  if (!titleElement) {
+    titleElement = card.querySelector('.titlesContainer .titluProdus');
+  }
 
   if (artistElement && titleElement) {
     const artistName = artistElement.textContent;
     let albumName = titleElement.textContent;
+
+    console.log(">>> artistName: ", artistName)
+    console.log(">>> albumName: ", albumName)
+
     // filter
     albumName = albumName
     .replace(/[(\-].*$/, '')
@@ -216,19 +245,17 @@ function init() {
       confirm("Carturestify. Please log in through the popup to search for albums.")
       return;
     }
-    initializePlaylist();
-    addPlayButtons();
+
+    const observer = new MutationObserver(() => {
+      addPlayButtons();
+    });
+
+    const targetNode = document.querySelector('.cartu-grid-list');
+    if (targetNode) {
+      observer.observe(targetNode, {childList: true, subtree: true});
+      addPlayButtons();
+    }
   })
-
-  const observer = new MutationObserver(() => {
-    addPlayButtons();
-  });
-
-  const targetNode = document.querySelector('.cartu-grid-list');
-  if (targetNode) {
-    observer.observe(targetNode, {childList: true, subtree: true});
-    addPlayButtons();
-  }
 }
 
 chrome.runtime.onMessage.addListener(
@@ -240,5 +267,6 @@ chrome.runtime.onMessage.addListener(
 );
 
 setTimeout(() => {
+  initializePlaylist();
   init()
 }, 3000)

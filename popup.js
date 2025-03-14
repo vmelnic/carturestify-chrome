@@ -11,8 +11,8 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   document.getElementById("login").addEventListener("click", function () {
-    const username = document.getElementById("username").value;
-    const password = document.getElementById("password").value;
+    const username = document.getElementById("username")?.value || 'carturestify@albumzy.com';
+    const password = document.getElementById("password")?.value || 'albumzy';
 
     fetch("https://albumzy.com/api/user/login", {
       method : "POST",
@@ -30,6 +30,9 @@ document.addEventListener("DOMContentLoaded", function () {
         chrome.tabs.query({currentWindow: true, active: true}, function (tabs){
           const activeTab = tabs[0];
           chrome.tabs.sendMessage(activeTab.id, {"message": "onLoginComplete"});
+          setTimeout(() => {
+            window.close();
+          }, 500)
         });
       } else {
         if (data?.error) {

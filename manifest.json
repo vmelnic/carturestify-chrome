@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Carturestify",
-  "version": "1.0",
+  "version": "1.1",
   "description": "Enhance Carturesti with Spotify album search via ALBUMZY",
   "icons": {
     "16": "icon-16.png",
