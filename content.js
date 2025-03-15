@@ -12,6 +12,7 @@ function initializePlaylist() {
   playlist.style.overflow = "hidden";
 
   const toolbar = document.createElement("div");
+  toolbar.id = "playlist-toolbar";
   toolbar.style.width = "100%";
   toolbar.style.height = "40px";
   toolbar.style.display = "flex";
@@ -22,6 +23,16 @@ function initializePlaylist() {
   toolbar.style.padding = "0 10px";
   toolbar.innerHTML = `<span>🎵 Carturestzy by ALBUMZY</span><button id="toggle-playlist" style="background: black; color: white; border: none; padding: 5px 10px; cursor: pointer;">➕</button>`;
   playlist.appendChild(toolbar);
+
+  const search = document.createElement("div");
+  search.id = "playlist-search";
+  search.className = "marquee-container";
+  search.style.height = "20px";
+  search.style.margin = "8px";
+  search.style.color = "blueviolet";
+  search.style.overflow = "auto";
+  search.style.display = "none";
+  playlist.appendChild(search);
 
   const playlistContent = document.createElement("div");
   playlistContent.id = "playlist-content";
@@ -147,15 +158,23 @@ function handlePlayClick(card) {
     const artistName = artistElement.textContent;
     let albumName = titleElement.textContent;
 
-    console.log(">>> artistName: ", artistName)
-    console.log(">>> albumName: ", albumName)
+    // filter by special keywords
+    let keywords = [
+      'Limited Edition'
+    ];
+    keywords.map((term) => {
+      if (albumName.includes(term)) {
+        let regex = new RegExp(term, 'gi');
+        albumName = albumName.replace(regex, '').trim();
+      }
+    });
 
-    // filter
+    // filter the rest of vinyl related stuff
     albumName = albumName
-    .replace(/[(\-].*$/, '')
-    .replace(/\b\d+\s*(Vinyl|Vinyls)\b/i, '')
-    .replace(/\b(Vinyl|Vinyls)\b/i, '')
-    .trim();
+      .replace(/[(\-].*$/, '')
+      .replace(/\b\d+\s*(Vinyl|Vinyls)\b/i, '')
+      .replace(/\b(Vinyl|Vinyls)\b/i, '')
+      .trim();
 
     searchAndDisplayAlbum(artistName, albumName);
     maximizePlaylist();
@@ -176,9 +195,9 @@ function createInfoMessage() {
 }
 
 function clearInfoMessage() {
-  const infoMessage = document.getElementById("info-message");
-  if (infoMessage) {
-    infoMessage.style.display = "none";
+  const element = document.getElementById("info-message");
+  if (element) {
+    element.style.display = "none";
   }
 }
 
@@ -195,6 +214,9 @@ function toggleSpinnerDisplay(display) {
 
 function searchAndDisplayAlbum(artist, album) {
   const playlistContent = document.getElementById("playlist-content");
+  const playlistSearch = document.getElementById("playlist-search");
+  playlistSearch.style.display = "none";
+
   clearInfoMessage()
 
   chrome.storage.local.get("ALBUMZY_TOKEN", (data) => {
@@ -206,8 +228,11 @@ function searchAndDisplayAlbum(artist, album) {
 
     toggleSpinnerDisplay('block')
 
-    const search = (artist !== album) ? `${artist} ${album}` : artist;
+    const search = (artist !== album) ? `${album} - ${artist}` : artist;
     console.log(">>> search for:", search)
+    playlistSearch.innerHTML = `<div class="marquee-content">🎵 Playing now 🎵 ${search}</div>`;
+    playlistSearch.style.display = "block";
+
     fetch("https://albumzy.com/api/spotify/search", {
       method : "POST",
       body   : JSON.stringify({search, limit: 3}),
@@ -250,7 +275,11 @@ function init() {
       addPlayButtons();
     });
 
-    const targetNode = document.querySelector('.cartu-grid-list');
+    let targetNode = document.querySelector('#coloana-produse .cartu-grid-list');
+    if (!targetNode) {
+      targetNode = document.querySelector('.product-grid .cartu-grid-list');
+    }
+
     if (targetNode) {
       observer.observe(targetNode, {childList: true, subtree: true});
       addPlayButtons();
@@ -258,15 +287,13 @@ function init() {
   })
 }
 
-chrome.runtime.onMessage.addListener(
-  function (request) {
-    if (request.message === "onLoginComplete") {
-      init();
-    }
+chrome.runtime.onMessage.addListener((request) => {
+  if (request.message === "onLoginComplete") {
+    init();
   }
-);
+});
 
 setTimeout(() => {
   initializePlaylist();
-  init()
+  init();
 }, 3000)

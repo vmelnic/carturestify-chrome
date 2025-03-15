@@ -1,4 +1,36 @@
+@font-face {
+    font-family: 'DS-Digital';
+    src: url('https://albumzy.com/fonts/DS-DIGI.TTF') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+.marquee-container {
+    overflow: hidden;
+    white-space: nowrap;
+    background: black;
+    position: relative;
+}
+
+.marquee-content {
+    font-family: 'DS-Digital', sans-serif;
+    display: inline-block;
+    color: #0f0;
+    background: black;
+    padding-left: 100%;
+    animation: marquee 10s linear infinite;
+}
+
+@keyframes marquee {
+    from {
+        transform: translateX(100%);
+    }
+    to {
+        transform: translateX(-100%);
+    }
 }
